@@ -132,6 +132,38 @@ def Check_evaluate(userCommitFile, judgeAFile, judgeBFile = None, aOrB = None):
             result["msg"] = "no error"
             result["data"] = {0: score}
             print(json.dumps(result))
+        else:
+            score = Evaluate(commit_data, judge_data_b)
+            result["status"] = True
+            # result["msg"] = "没有错误"
+            result["msg"] = "no error"
+            result["data"] = {0: score}
+            print(json.dumps(result))
+    else:
+        """
+        load data
+        """
+        try:
+            commit_data = pd.read_csv(userCommitFile, encoding = "gbk")
+            judge_data = pd.read_csv(judgeAFile, encoding = "gbk")
+        except:
+            result["status"] = False
+            result["msg"] = "parameter error"
+            print(json.dumps(result))
+            exit()
+
+        """
+        check shape of commit_data
+        """
+        if commit_data.shape[0] != judge_data.shape[0]:
+            result["status"] = False
+            result["msg"] = "num_rows error"
+            print(json.dumps(result))
+            exit()
+        if commit_data.shape[1] != judge_data.shape[1]:
+            result["status"] = False
+            result["msg"] = "num_columns error"
+            print(json.dumps(result))
             exit()
 
 if __name__ == "__main__":
