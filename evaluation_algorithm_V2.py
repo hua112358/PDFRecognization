@@ -166,6 +166,69 @@ def Check_evaluate(userCommitFile, judgeAFile, judgeBFile = None, aOrB = None):
             print(json.dumps(result))
             exit()
 
+        """
+        check columns and index
+        """
+        if (commit_data.columns.values == judge_data.columns.values).mean() < 1:
+            result["status"] = False
+            # result["msg"] = "列名错误"
+            result["msg"] = "column name error"
+            print(json.dumps(result))
+            exit()     
+
+        """
+        check max and min values
+        """
+        if commit_data.max().max() > sys.maxsize or commit_data.min().min() < -sys.maxsize - 1:
+            result["status"] = False
+            # result["msg"] = "数值越界错误"
+            result["msg"] = "number out of bounds"
+            print(json.dumps(result))
+            exit()
+
+        """
+        check nan
+        """
+#        if commit_data.mean().mean() != 0:
+#            result["status"] = False
+#            # result["msg"] = "空值错误"
+#            result["msg"] = "nan error"
+#            print(json.dumps(result))
+#            exit()
+        
+        """
+        check dtype
+        """
+        for i in range(commit_data.shape[1]):
+            if commit_data.iloc[:, i].dtype != judge_data.iloc[:, i].dtype:
+                result["status"] = False
+                # result["msg"] = str(i) + "列类型错误"
+                result["msg"] = str(i) + "column type error"
+                print(json.dumps(result))
+                exit()
+        
+        """
+        check id
+        """
+#        equal_array = (np.sort(commit_data["ID"].values) ==  \
+#        np.sort(judge_data["ID"].values))
+#        if equal_array.mean() != 0:
+#            result["status"] = False
+#            # result["msg"] = "ID错误"
+#            result["msg"] = "ID error"
+#            print(json.dumps(result))
+#            exit()
+        
+        """
+        compute score
+        """
+        score = Evaluate(commit_data, judge_data)
+        result["status"] = True
+        # result["msg"] = "没有错误"
+        result["msg"] = "no error"
+        result["data"] = {0: score}
+        print(json.dumps(result))
+
 if __name__ == "__main__":
     num_argvs = len(sys.argv) - 1
     if num_argvs == 2:
